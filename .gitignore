@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+backend/venv/
+backend/models/*.onnx
+backend/models/*.onnx.json
+backend/config.json

@@ -1,0 +1,8 @@
+faster-whisper>=1.0
+piper-tts>=1.4
+sounddevice>=0.5
+numpy>=1.24
+pillow>=10.0
+materialyoucolor>=3.0
+requests>=2.31
+webrtcvad>=2.0.10
