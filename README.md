@@ -1,136 +1,145 @@
-# Traiter — Asistente de voz con IA para QuickShell / Hyprland
+# Traiter — Voice AI Assistant for QuickShell / Hyprland
 
-Asistente activado por voz que usa **DeepSeek AI**, **faster-whisper** y **piper-tts**. Integrado como overlay en QuickShell (Illogical Impulse). Presiona `SUPER + H`, habla, y la IA responde por audio.
+Voice-activated AI assistant using **your preferred LLM provider**, powered by **faster-whisper** and **piper-tts**. Integrates as an overlay in QuickShell (Illogical Impulse). Press `SUPER + H`, speak, and the AI responds with voice.
 
-## Requisitos
+## Requirements
 
-- **QuickShell** con la configuración **ii** (Illogical Impulse)
-- **Hyprland** (o cualquier compositor Wayland con soporte de capas)
-- **Python 3.10+**
-- **pip** y **venv**
+- **QuickShell** with the **ii** profile (Illogical Impulse)
+- **Hyprland** (or any Wayland compositor with layer-shell support)
+- **Python 3.10+** with `pip` and `venv`
+- **Arch Linux** recommended (scripts are tested on Arch)
 
-## Instalación
+## Quick Install
 
 ```bash
-git clone https://github.com/tu-usuario/traiter
-cd traiter
+git clone https://github.com/olymperatus/Traiter.git
+cd Traiter
 chmod +x install.sh
 ./install.sh
 ```
 
-Esto:
-1. Crea un entorno virtual Python e instala dependencias
-2. Descarga el modelo de voz en español (sharvard-medium, ~50MB)
-3. Enlaza los archivos QML a `~/.config/quickshell/ii/modules/ii/assistant/`
-4. Enlaza el backend a `~/.config/quickshell/ii/scripts/assistant/main.py`
+This will:
+1. Create a Python virtual environment and install dependencies
+2. Download an English TTS voice model (amy-medium, ~44MB)
+3. Symlink QML files to `~/.config/quickshell/ii/modules/ii/assistant/`
+4. Symlink the backend to `~/.config/quickshell/ii/scripts/assistant/main.py`
 
-## Configuración manual
+## Manual Configuration
 
-### 1. Agregar al panel familiar
+### 1. Register in panel family
 
-En `~/.config/quickshell/ii/panelFamilies/IllogicalImpulseFamily.qml`:
+In `~/.config/quickshell/ii/panelFamilies/IllogicalImpulseFamily.qml`:
 
 ```qml
 PanelLoader { component: Assistant {} }
 ```
 
-### 2. Agregar atajo de teclado
+### 2. Add a keybind
 
-En `~/.config/hypr/hyprland/keybinds.lua` (o tu archivo de binds):
+In your Hyprland keybinds.lua:
 
 ```lua
 hl.bind("SUPER + H", hl.dsp.global("assistant:toggle"),
     { description = "Assistant: Toggle AI Assistant" })
 ```
 
-### 3. Clave de API DeepSeek
+### 3. LLM provider setup
 
-Edita `backend/config.json` y agrega tu `api_key`:
+Edit `backend/config.json`:
 
 ```json
 {
-  "deepseek": {
-    "api_key": "sk-tu-clave-aqui"
+  "llm": {
+    "api_key": "your-api-key",
+    "model": "gemini-2.5-flash",
+    "api_url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
   }
 }
 ```
 
-Consigue una clave gratuita en [platform.deepseek.com](https://platform.deepseek.com).
+Supported providers (OpenAI-compatible API):
+- **DeepSeek**: `https://api.deepseek.com/v1/chat/completions`
+- **OpenAI**: `https://api.openai.com/v1/chat/completions`
+- **OpenRouter**: `https://openrouter.ai/api/v1/chat/completions`
+- **Gemini** (via OpenRouter): `model: google/gemini-2.5-flash`
 
-### 4. Reiniciar QuickShell
+Leave `api_url` empty to use the built-in DeepSeek endpoint.
+
+### 4. Restart QuickShell
 
 ```bash
 killall quickshell; qs -c ii &
 ```
 
-## Uso
+## Usage
 
-1. `SUPER + H` — abre el overlay y empieza a escuchar automáticamente
-2. Habla directamente (sin botones)
-3. Después de 3 segundos de silencio, la IA procesa y responde por audio
-4. Si no detecta voz, la IA igual responde (saludo)
-5. `SUPER + H` o clic fuera — cierra y cancela la operación
+1. `SUPER + H` — opens the overlay and starts listening
+2. Speak directly (no buttons needed)
+3. After 3 seconds of silence, the AI processes your speech and responds with voice
+4. If no speech is detected, the AI still responds (greeting)
+5. `SUPER + H` or click outside — closes and cancels
 
-## Archivos
+## Project Structure
 
 ```
 traiter/
 ├── backend/
-│   ├── main.py              — Servidor Python
-│   ├── config.json          — Configuración (API key, tiempos, etc.)
-│   ├── prompts.json         — Prompt del sistema de la IA
-│   ├── requirements.txt     — Dependencias Python
-│   ├── download_voice.py    — Descargar modelos TTS
+│   ├── main.py              — Python server
+│   ├── config.json          — Configuration (API key, timing, etc.)
+│   ├── config.example.json  — Example config (safe for repo)
+│   ├── prompts.json         — AI system prompt
+│   ├── requirements.txt     — Python dependencies
+│   ├── download_voice.py    — TTS voice model downloader
 │   ├── modules/
-│   │   ├── stt.py           — Reconocimiento de voz (Whisper + WebRTC VAD)
-│   │   ├── tts.py           — Síntesis de voz (Piper)
-│   │   ├── ai.py            — Cliente DeepSeek
-│   │   ├── server.py        — Servidor HTTP con ThreadingMixIn
-│   │   ├── colors.py        — Colores Material You desde el wallpaper
-│   │   ├── config.py        — Cargador de configuración
-│   │   └── zombie.py        — Protección contra procesos duplicados
-│   └── models/              — Modelos de voz .onnx
+│   │   ├── stt.py           — Speech-to-Text (Whisper + WebRTC VAD)
+│   │   ├── tts.py           — Text-to-Speech (Piper)
+│   │   ├── ai.py            — LLM client (provider-agnostic)
+│   │   ├── server.py        — HTTP server (threaded)
+│   │   ├── colors.py        — Material You color extraction
+│   │   ├── config.py        — Config loader with legacy support
+│   │   └── zombie.py        — PID guard (single instance)
+│   └── models/              — TTS voice models (.onnx)
 ├── quickshell/
-│   ├── Assistant.qml        — Controlador principal
-│   ├── AssistantOverlay.qml — Interfaz de usuario
-│   ├── AssistantBars.qml    — Barras animadas
-│   ├── AssistantBar.qml     — Barra individual
-│   ├── AssistantParticles.qml — Sistema de partículas
-│   └── Particle.qml         — Partícula individual
-├── install.sh               — Instalador completo
-├── link.sh                  — Solo enlaces simbólicos
-├── monitor.sh               — Panel de monitoreo
+│   ├── Assistant.qml        — Main controller
+│   ├── AssistantOverlay.qml — User interface overlay
+│   ├── AssistantBars.qml    — Animated bars
+│   ├── AssistantBar.qml     — Individual bar
+│   ├── AssistantParticles.qml — Particle system
+│   └── Particle.qml         — Single particle
+├── install.sh               — Full installer
+├── link.sh                  — Symlink only
 └── README.md
 ```
 
-## Personalización
+## Configuration
 
-Edita `backend/config.json` para ajustar:
+Edit `backend/config.json` to adjust:
 
-| Clave | Descripción | Default |
-|-------|-------------|---------|
-| `stt.silence_timeout` | Segundos de silencio tras hablar | 3 |
-| `stt.no_speech_timeout` | Máx. segundos sin detectar voz | 8 |
-| `stt.model_size` | Modelo Whisper (tiny/base/small) | tiny |
-| `tts.output_sample_rate` | Frecuencia de salida de audio | 44100 |
-| `deepseek.model` | Modelo de IA | deepseek-chat |
+| Key | Description | Default |
+|-----|-------------|---------|
+| `stt.silence_timeout` | Seconds of silence after speech before stopping | 3 |
+| `stt.no_speech_timeout` | Max seconds without detecting speech | 8 |
+| `stt.model_size` | Whisper model (tiny/base/small) | tiny |
+| `stt.language` | STT language code | en |
+| `tts.output_sample_rate` | Audio output sample rate | 44100 |
+| `llm.model` | LLM model name | gemini-2.5-flash |
 
-## Solución de problemas
+## Troubleshooting
 
-**No se escucha respuesta**: verifica que `piper-tts` esté instalado y haya un modelo en `backend/models/`.
+**No audio response**: Ensure piper-tts is installed and a voice model exists in `backend/models/`.
 
-**El reconocimiento no funciona**: revisa el micrófono con `pavucontrol`. Ajusta `stt.vad_threshold` en `config.json`.
+**Speech not recognized**: Check your microphone with `pavucontrol`. Adjust `stt.vad_threshold` in `config.json`.
 
-**Para reiniciar el backend**:
+**Restart the backend**:
 ```bash
 kill $(cat /tmp/traiter_backend.pid)
 ```
 
-**Ver logs**:
+**Monitor logs**:
 ```bash
-./monitor.sh -w
+tail -f /run/user/1000/quickshell/by-id/*/log.qslog
 ```
 
-## Licencia
+## License
 
 GNU GPL v3.0

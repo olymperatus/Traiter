@@ -2,13 +2,15 @@ import json, urllib.request, logging
 
 log = logging.getLogger("assistant.ai")
 
-API_URL = "https://api.deepseek.com/v1/chat/completions"
+DEFAULT_API_URL = "https://api.deepseek.com/v1/chat/completions"
 
 def query(text, cfg, prompts=None):
     messages = []
     if prompts and "system_prompt" in prompts:
         messages.append({"role": "system", "content": prompts["system_prompt"]})
     messages.append({"role": "user", "content": text})
+
+    api_url = cfg.get("api_url") or DEFAULT_API_URL
 
     payload = json.dumps({
         "model": cfg["model"],
@@ -18,7 +20,7 @@ def query(text, cfg, prompts=None):
         "temperature": prompts.get("temperature", 0.7) if prompts else 0.7,
     }).encode()
     req = urllib.request.Request(
-        API_URL, data=payload,
+        api_url, data=payload,
         headers={
             "Content-Type": "application/json",
             "Authorization": f"Bearer {cfg['api_key']}",

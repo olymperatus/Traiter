@@ -20,6 +20,7 @@ for cmd in python3.12 python3.11 python3.10 python3; do
 done
 if [ -z "$PYTHON" ]; then
     echo "ERROR: Python 3.10+ not found. Install it first."
+    echo "  On Arch: pacman -S python python-pip python-virtualenv"
     exit 1
 fi
 echo "  Python: $($PYTHON --version)"
@@ -46,8 +47,8 @@ echo "  Done"
 echo "[2/4] Checking TTS voice model..."
 onix_count=$(ls "$PROJECT_DIR/backend/models/"*.onnx 2>/dev/null | wc -l)
 if [ "$onix_count" -eq 0 ]; then
-    echo "  Downloading Spanish voice model..."
-    $PYTHON "$PROJECT_DIR/backend/download_voice.py" sharvard-medium
+    echo "  Downloading English voice model..."
+    $PYTHON "$PROJECT_DIR/backend/download_voice.py" amy-medium
 else
     echo "  Voice model found ($onix_count)"
 fi
@@ -71,10 +72,9 @@ echo "=== Installation complete ==="
 echo ""
 echo "Next steps:"
 echo ""
-echo "  1. Add your DeepSeek API key:"
+echo "  1. Configure your LLM provider:"
 echo "     Edit $PROJECT_DIR/backend/config.json"
-echo "     Set \"api_key\": \"sk-your-key-here\""
-echo "     Get a key at https://platform.deepseek.com"
+echo "     Set llm.api_key and optionally llm.api_url"
 echo ""
 echo "  2. Register the module in your panel family:"
 echo "     Edit $QS_DIR/panelFamilies/IllogicalImpulseFamily.qml"
@@ -87,7 +87,3 @@ echo '         { description = "Assistant: Toggle AI Assistant" })'
 echo ""
 echo "  4. Restart QuickShell:"
 echo "     killall quickshell; qs -c ii &"
-echo ""
-echo "Quick links:"
-echo "  Monitor:  ./monitor.sh -w"
-echo "  Docs:     cat README.md"

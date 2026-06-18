@@ -27,6 +27,6 @@ server.start(
     cfg["server"]["port"],
     stt_mod,
     tts_mod,
-    cfg["deepseek"],
+    cfg["llm"],
     prompts,
 )

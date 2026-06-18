@@ -3,16 +3,17 @@
     "host": "127.0.0.1",
     "port": 58901
   },
-  "deepseek": {
+  "llm": {
+    "api_url": "",
     "api_key": "",
-    "model": "deepseek-chat",
+    "model": "gemini-2.5-flash",
     "timeout": 30
   },
   "stt": {
     "model_size": "tiny",
     "device": "cpu",
     "compute_type": "int8",
-    "language": "es",
+    "language": "en",
     "sample_rate": 16000,
     "record_timeout": 30
   },

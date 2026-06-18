@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Download a Spanish piper-tts voice model."""
+"""Download a piper-tts voice model."""
 
 import sys
 import os
@@ -8,6 +8,11 @@ from pathlib import Path
 MODEL_DIR = Path(__file__).parent / 'models'
 
 VOICES = {
+    "amy-medium": {
+        "url": "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_GB/amy/medium/en_GB-amy-medium.onnx",
+        "config": "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_GB/amy/medium/en_GB-amy-medium.onnx.json",
+        "size_mb": 44,
+    },
     "sharvard-medium": {
         "url": "https://huggingface.co/rhasspy/piper-voices/resolve/main/es/es_ES/sharvard/medium/es_ES-sharvard-medium.onnx",
         "config": "https://huggingface.co/rhasspy/piper-voices/resolve/main/es/es_ES/sharvard/medium/es_ES-sharvard-medium.onnx.json",
@@ -46,8 +51,8 @@ def main():
         for i, name in enumerate(VOICES.keys(), 1):
             info = VOICES[name]
             print(f"  {i}. {name} ({info['size_mb']}MB)")
-        print(f"\nDefault: sharvard-medium (recommended)")
-        choice = "sharvard-medium"
+        print(f"\nDefault: amy-medium (English, recommended)")
+        choice = "amy-medium"
 
     if choice not in VOICES:
         try:
