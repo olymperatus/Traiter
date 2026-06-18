@@ -4,3 +4,4 @@ backend/venv/
 backend/models/*.onnx
 backend/models/*.onnx.json
 backend/config.json
+backend/prompts.json
