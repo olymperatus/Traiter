@@ -1,4 +1,4 @@
-# Traiter — Voice AI Assistant for QuickShell / Hyprland
+# Traiter — Voice AI Assistant for ii
 
 Voice-activated AI assistant using **your preferred LLM provider**, powered by **faster-whisper** and **piper-tts**. Integrates as an overlay in QuickShell (Illogical Impulse). Press `SUPER + H`, speak, and the AI responds with voice.
 
